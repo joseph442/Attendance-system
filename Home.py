@@ -1,7 +1,16 @@
 #!/usr/bin/env python3
+import socket
 import os
 import sys
 import psutil
+
+def check_no_network():
+    """Return True if it fails to resolve Google's URL, False otherwise"""
+    try:
+        socket.gethostbyname("www.google.com")
+        return False
+    except:
+        return True
 
 def check_cpu_usage(percent):
     usage = psutil.cpu_percent(1)
@@ -13,14 +22,22 @@ def check_reboot():
     return os.path.exists("/run/reboot-required")
 
 def main():
+    checklist = []
+
     if check_reboot():
-        print("Pending Reboot in this system")
+        checklist.append("Pending Reboot")
+    if not check_cpu_usage(75):
+        checklist.append("CPU Overloaded")
+    if check_no_network():
+        checklist.append("No Network")
+
+    if checklist:
+        print("Issues found:")
+        for item in checklist:
+            print("- " + item)
         sys.exit(1)
     else:
-        if not check_cpu_usage(75):
-            print("ERROR! CPU is overloaded")
-        else:
-            print("Everything is ok")
+        print("Everything is ok")
 
 main()
-print("thanks")
+print("Thanks")
