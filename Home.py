@@ -23,3 +23,4 @@ def main():
             print("Everything is ok")
 
 main()
+print("thanks")
